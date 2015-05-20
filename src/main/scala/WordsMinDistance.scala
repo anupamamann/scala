@@ -9,7 +9,7 @@ import scala.io.Source
 object WordsMinDistance {
 
   /**
-   *
+   * TODO: return the number of words between the searched words
    * @param num list of indices of all words
    * @return min window length containing all words
    */
@@ -115,7 +115,6 @@ object WordsMinDistance {
             return -1
           }
         }
-        println(searchWords + "::" + searchWords.distinct.size)
 
         /*
           generate list of indices of the search words
@@ -128,8 +127,6 @@ object WordsMinDistance {
           case (word, indexList) =>
             (indexList.map(_._2))
         }.toList
-
-        println(pairs + "::" + pairs.size)
 
         /**
          * case 1: Not all words were found in the text
