@@ -8,38 +8,39 @@ class WordsMinDistanceTest extends FlatSpec with Matchers {
     val filePath = "src/test/resources/MK-Bio"
     val abcPath = "src/test/resources/abc.txt"
     val baabPath = "src/test/resources/baab.txt"
+    val abcdePath = "src/test/resources/abcde.txt"
 
 
-  "min Distance" should "not run with null file" in {
+  "min Distance" should "error(-1) with null file" in {
     val searchWords = List("born", "family")
     assert(WordsMinDistance(null, searchWords) == -1)
 
   }
 
-  "min Distance" should "not run with wrong file path" in {
+  "min Distance" should "error (-1) with wrong file path" in {
     val searchWords = List("born", "family")
     assert(WordsMinDistance("hello", searchWords) == -1)
 
   }
 
-  "min Distance" should "not run with insufficient search words" in {
+  "min Distance" should "error (-1) for insufficient search words" in {
     val searchWords = List("born")
-    assert(WordsMinDistance(filePath, searchWords) == 0)
+    assert(WordsMinDistance(filePath, searchWords) == -1)
 
   }
 
   "min Distance" should "be 11" in {
     val searchWords = List("born", "family")
-    assert(WordsMinDistance(filePath, searchWords) == 11)
+    assert(WordsMinDistance(filePath, searchWords) == 10)
   }
 
   "min Distance" should "be 278" in {
     val searchWords = List("born", "family", "married")
-    assert(WordsMinDistance(filePath, searchWords) == 278)
+    assert(WordsMinDistance(filePath, searchWords) == 277)
 
   }
 
-  "min Distance" should "be -1, words do not exist in text" in {
+  "min Distance" should "be -1 when words do not exist in text" in {
     val searchWords = List("bleh", "rule", "hellooo")
     assert(WordsMinDistance(filePath, searchWords) == -1)
 
@@ -66,7 +67,7 @@ class WordsMinDistanceTest extends FlatSpec with Matchers {
   }
 
   "min Distance" should "be -1 when only one word is found" in {
-    WordsMinDistance(abcPath, List("b","b")) should be (0)
+    WordsMinDistance(abcPath, List("b","b")) should be (-1)
   }
 
   "min Distance" should "be 2 when the same word is present with 2 words in between" in {
@@ -82,7 +83,7 @@ class WordsMinDistanceTest extends FlatSpec with Matchers {
   }
 
   "min Distance" should "be 6 when the words are spread on the text with 6 words in between" in {
-    WordsMinDistance(baabPath, List("a","c","e")) should be (6)
+    WordsMinDistance(abcdePath, List("a","c","e")) should be (6)
   }
 }
 

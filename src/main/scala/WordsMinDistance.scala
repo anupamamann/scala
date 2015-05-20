@@ -21,7 +21,6 @@ object WordsMinDistance {
     }
   }
 
-
   /**
    * This function moves the pointer of the list containing the smallest indices
    * @param indexes list of indices of all words in the text
@@ -52,14 +51,26 @@ object WordsMinDistance {
       case Nil =>
         return minWindow
       case _ =>
-        if (!indexes.map(f => f.size).contains(0)) {
+
+        /**
+         * case: search two occurrence of the same word
+         * return error if the word occurs only once
+         * else return the distance between first two occurrences
+         */
+
+        if (indexes.size == 1) {
+          if (indexes.head.size < 2)
+            minWindow
+          else
+            indexes.flatMap(l => l.take(2)).reduceLeft { (a, b) => (b - a) }
+        } else if (!indexes.map(f => f.size).contains(0)) {
           val minWindowLength = minDistance(indexes)
           if (minWindowLength < minWindow)
-            return findDistance(updateIndexes(indexes), minWindowLength)
+            findDistance(updateIndexes(indexes), minWindowLength)
           else
-            return findDistance(updateIndexes(indexes), minWindow)
+            findDistance(updateIndexes(indexes), minWindow)
         } else {
-          return minWindow
+          minWindow
         }
     }
   }
@@ -93,39 +104,74 @@ object WordsMinDistance {
 
       } else if (searchWords.isEmpty || searchWords.size < 2) {
         usage("Insufficient query words")
-        return 0
+        return -1
 
       } else {
         val words = try {
-          Source.fromFile(filePath).mkString.split("""\W+""")
+          Source.fromFile(filePath).mkString.split( """\W+""")
         } catch {
           case ex: FileNotFoundException => {
             usage("Missing File Exception")
             return -1
           }
         }
+        println(searchWords + "::" + searchWords.distinct.size)
+
+        /*
+          generate list of indices of the search words
+          pairs => List[List[Int]]
+         */
         val pairs = words.toList.zip(words.indices).groupBy {
           case (k, v) => k
         }.filter(k => searchWords.contains(k._1))
           .map {
-          case (k, v) =>
-            (v.map(_._2))
+          case (word, indexList) =>
+            (indexList.map(_._2))
         }.toList
+
+        println(pairs + "::" + pairs.size)
+
+        /**
+         * case 1: Not all words were found in the text
+         */
+        if (pairs.size != searchWords.distinct.size)
+          return -1
+
+        /**
+         * case 1: Searching for two instances of same word
+         * case 2: Searching for different words
+         */
+
         findDistance(pairs, Int.MaxValue)
       }
 
+    /**
+     * case 1: findDistance returns MaxValue
+     * if the searched words were not found in the text
+     *
+     * case2:
+     * consecutive occurrence of words,
+     * the distance is 0 as there is no word in between the searched word
+     *
+     *  case3:
+     * for all other minDistance represents
+     * the number of words in between searched words
+     */
     if (minDistance == Int.MaxValue)
       -1
+    else if (minDistance == searchWords.distinct.size - 1)
+      0
     else
-      minDistance
+      minDistance - 1
+
   }
 
-  def main (args: Array[String]) {
-    if(args.length<2)
+  def main(args: Array[String]) {
+    if (args.length < 2)
       usage("Invalid Input")
-    else{
-      val searchWords = args(1).toString.split("""\W+""").toList
-      println("Window length:"+ WordsMinDistance(args(0), searchWords))
+    else {
+      val searchWords = args(1).toString.split( """\W+""").toList
+      println("Window length:" + WordsMinDistance(args(0), searchWords))
 
     }
   }
